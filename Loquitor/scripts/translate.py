@@ -1,5 +1,6 @@
 from getpass import getpass
 import locale
+import os
 
 from BingTranslator import Translator
 
@@ -13,13 +14,19 @@ class UnknownLanguageError(_parser.ParsingError):
 
 class main:
     def __init__(self, room, bot, client):
-        print("If you would like to have the translate command, please give your Bing translation credentials.  If you aren't willing, just hit Enter to skip this feature.")
-        client_id = input("Client ID: ")
-        if not client_id:
-            return
-        secret = getpass("Secret: ")
-        if not secret:
-            return
+        if bot.no_input:
+            client_id = os.getenv("BING_ID")
+            secret = os.getenv("BING_SECRET")
+            if None in (client_id, secret):
+                return
+        else:
+            print("If you would like to have the translate command, please give your Bing translation credentials.  If you aren't willing, just hit Enter to skip this feature.")
+            client_id = input("Client ID: ")
+            if not client_id:
+                return
+            secret = getpass("Secret: ")
+            if not secret:
+                return
 
         self.translator = Translator(client_id, secret)
         self.parser = _parser.Parser(['from', 'to'], self.parse_token)

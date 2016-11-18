@@ -51,13 +51,14 @@ class Bot:
         "https://chat.stackoverflow.com/transcript/message/33205451",
 
     )
-    def __init__(self, room, client, config_dir):
+    def __init__(self, room, client, config_dir, no_input):
         if not client.logged_in:
             raise ValueError("Client must be logged in.")
 
         self.room = room
         self.client = client
         self.config_dir = config_dir
+        self.no_input = no_input
 
         self.commands = {}
         self.responses = {}
@@ -188,12 +189,12 @@ class Command(metaclass=EventMeta):
 skeleton.Events.register('command', Command)
 
 
-def main(room, username, password, config_dir, host='stackoverflow.com'):
+def main(username, password, room, config_dir, host='stackoverflow.com', no_input=False):
     from . import scripts
 
     client = chatexchange.Client(host, username, password)
     room = skeleton.Room(room, client)
-    bot = Bot(room, client, config_dir)
+    bot = Bot(room, client, config_dir, no_input)
 
     for module_name in scripts.__all__:
         module = sys.modules['Loquitor.scripts.{}'.format(module_name)]
