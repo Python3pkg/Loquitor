@@ -66,6 +66,7 @@ if __name__ == '__main__':
         'room': 'LOQ_ROOM',
     }
     keys = ['username', 'password', 'room', 'config_dir', 'site', 'no_input']
+    no_input = config['no_input']
     for key in keys:
         if config[key] is None and key in envs:
             config[key] = os.getenv(envs[key])
