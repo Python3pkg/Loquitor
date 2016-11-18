@@ -65,8 +65,7 @@ if __name__ == '__main__':
         'site': 'LOQ_SITE',
         'room': 'LOQ_ROOM',
     }
-    keys = ['username', 'password', 'room', 'config_dir', 'site']
-    no_input = config.pop("no_input")
+    keys = ['username', 'password', 'room', 'config_dir', 'site', 'no_input']
     for key in keys:
         if config[key] is None and key in envs:
             config[key] = os.getenv(envs[key])
@@ -82,6 +81,3 @@ if __name__ == '__main__':
 
     print("Loading...", end="\r")
     bot.main(*(config[key] for key in keys))
-
-if __name__ == "__main__":
-    main()
