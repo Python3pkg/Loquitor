@@ -27,6 +27,8 @@ def on_say(event, room, client, bot):
     if len(event.args) == 3 and event.args[1] == "to":
         user_name = convert_username(event.args[2], event)
         query = "@{}: {}".format(user_name, event.args[0])
+    else:
+        query = ") " + query
 
     room.send_message(query)
 
