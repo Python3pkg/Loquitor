@@ -7,6 +7,7 @@ import html
 from random import choice
 import shlex
 import sys
+import time
 from traceback import print_exc
 import unicodedata
 
@@ -212,9 +213,17 @@ def main(username, password, room, config_dir, host='stackoverflow.com', no_inpu
 
 
     send = room.send_message
-    interact_vars = locals()
-    interact_vars.update(globals())
-    interact(banner="Welcome to Loquitor!", local=locals())
+    if no_input:
+        try:
+            print("Loquitor successfully started.")
+            while True:
+                time.sleep(5)
+        except KeyboardInterrupt:
+            pass
+    else:
+        interact_vars = locals()
+        interact_vars.update(globals())
+        interact(banner="Welcome to Loquitor!", local=locals())
 
 
 def remove_ctrl_chars(s):
