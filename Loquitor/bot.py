@@ -119,7 +119,10 @@ class Bot:
         signal_name = 'Command_{}'.format(command)
         event_cls = type(signal_name, (Command,), {})
         event_cls.help = help
-        skeleton.Events.register(signal_name, event_cls)
+        try:
+            skeleton.Events.register(signal_name, event_cls)
+        except AssertionError: # If a bot was run before
+            pass
         self.commands[command] = event_cls
         self.room.connect(signal_name, function, self)
 
@@ -211,19 +214,7 @@ def main(username, password, room, config_dir, host='stackoverflow.com', no_inpu
         else:
             print("Invalid script file: {!r}".format(module_name))
 
-
-    send = room.send_message
-    if no_input:
-        try:
-            print("Loquitor successfully started.")
-            while True:
-                time.sleep(5)
-        except KeyboardInterrupt:
-            pass
-    else:
-        interact_vars = locals()
-        interact_vars.update(globals())
-        interact(banner="Welcome to Loquitor!", local=locals())
+    return client, room, bot
 
 
 def remove_ctrl_chars(s):

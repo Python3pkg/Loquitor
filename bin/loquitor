@@ -1,9 +1,11 @@
 #!/usr/bin/python
 
 import argparse
+from code import interact
 from getpass import getpass
 import os
 import sys
+import time
 
 from Loquitor import bot
 
@@ -81,4 +83,14 @@ if __name__ == '__main__':
         config['config_dir'] = os.path.expanduser("~/.loquitor")
 
     print("Loading...", end="\r")
-    bot.main(*(config[key] for key in keys))
+    client, room, bot = bot.main(*(config[key] for key in keys))
+    if bot.no_input:
+        try:
+            print("Loquitor successfully started in {}.".format(room.name))
+            while True:
+                time.sleep(5)
+        except KeyboardInterrupt:
+            pass
+    else:
+        send = room.send_message
+        interact(banner="Welcome to Loquitor!", local=locals())
