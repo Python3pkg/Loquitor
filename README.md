@@ -1,9 +1,23 @@
 # Loquitor
 A chatbot for Stack Exchange
 
+##Installation and running
+
 To install with pip, run:
 
-`[sudo] pip3 install git+https://github.com/ralphembree/Loquitor.git --process-dependency-links`
+    [sudo] pip3 install git+https://github.com/ralphembree/Loquitor.git --process-dependency-links
+
+This will install the `loquitor` binary and the `Loquitor` Python package.
+
+To run, just type `loquitor` (and ENTER) into a terminal.  You will be asked for an e-mail address, a password, the chat host (either stackoverflow.com, stackexchange.com, or meta.stackexchange.com), and the ID of the room you want to join.  After that is loaded and Loquitor has joined a room, the `translate` script will ask you for Bing translation credentials.  If you don't have any, just hit Enter to skip that feature.  Note that ignoring it instead of hitting Enter means that the rest of the scripts will not be run, so some commands might be missing.
+
+You can also supply information as command-line options.  A full list of options can be seen by running `loquitor --help`.  Note that scripts such as `translate` are not run until after the command-line options are parsed, so they rely on environment variables if they can't have input.
+
+Environment variables are also available for giving information.  The currently used ones are `LOQ_EMAIL`, `LOQ_PASSWORD`, `LOQ_SITE`, `BING_ID`, and `BING_SECRET`.  Using environment variables is helpful for when you would like to run loquitor in the background.  Just make sure that both `LOQ_EMAIL` and `LOQ_PASSWORD` are defined and that you run loquitor with the `--no-input` and `-r ROOM` options (`-r` gives the room ID).  If `--no-input` is given and `LOQ_SITE` is not defined, it will default to stackoverflow.com.  If `BING_ID` and/or `BING_SECRET` are not defined, the translate command will not be available.  If either of `LOQ_EMAIL` or `LOQ_PASSWORD` is not defined, loquitor will throw an error and return an exit code of 1.  Note that these behaviors are only if `--no-input` is given.
+
+## Heroku
+
+I run Loquitor on Heroku (but I hope to find something better).  I do that by connecting the Heroku account to [this Github repository](https://github.com/ralphembree/Loquitor-Heroku).  Details are given there.
 
 ## Commands
 
@@ -12,7 +26,10 @@ A command is given to the bot by prepending a chat message with `>>`.  Those com
 * `define QUERY`: Searches wiktionary.org for the meaning of a word or phrase.
 * `greet USER1 [USER2] [USER3] ...`: For each user given, greet that user (no @ is needed when giving the names.)
 * `help [CMD]`: Gives help on all commands that implement help (probably everything).  If the name of a command is passed to `help` (without `>>`), it gives help on only that command.
-* `pause TIME`: Pause for the specified amount of time.  When the bot is paused, it may respond to messages already posted, but it will not listen for more messages until the time runs out.  Only room owners can run this command.
+* `kaomoji`: Displays a list of the kaomoji substitutions available.  If the `all` argument is given, it will also display the aliases.  The kaomoji substitutions occur when someone posts a message (without the >>) that matches one of Loquitor's substitution keys.  If it does, Loquitor will post a random kaomoji that matches that key.  For example, `&happy;` might give o((\*^▽^\*))o, (ﾉ^∇^)ﾉﾟ, ⌒°(ᴖ◡ᴖ)°⌒, or any of a dozen others.
+* `meta QUERY`: Searches meta.stackoverflow.com and meta.stackexchange.com for QUERY.  It is a shortcut for `>>search site:(meta.stackoverflow.com or meta.stackexchange.com) QUERY`.
+* `pause TIME`: Pauses for the specified amount of time.  When the bot is paused, it may respond to messages already posted, but it will not listen for more messages until the time runs out.  Only room owners can run this command.
+* `say TEXT [to USER]`: Repeats text.  If `to USER` is given, prepends `@USER: ` to the message.  The ping happens only if `TEXT` is in quotation marks.  That is to prevent `>>say Go to England` from pinging the non-existent `England` user.
 * `search QUERY`: Gives a list of ten search results from Bing.  Because of the limitations of chat formatting, the results are given like this:
 
 >   \> Speedtest.net - Official Site, (https://speedtest.net)
