@@ -2,8 +2,8 @@ from collections import defaultdict
 import re
 from threading import Thread
 
-import chatexchange6 as chatexchange
-from chatexchange6 import events
+import chatexchange
+from chatexchange import events
 
 def get_subs(cls):
     subs = cls.__subclasses__()

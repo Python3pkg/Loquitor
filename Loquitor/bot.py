@@ -11,7 +11,7 @@ import time
 from traceback import print_exc
 import unicodedata
 
-import chatexchange6 as chatexchange
+import chatexchange
 
 from . import skeleton
 
