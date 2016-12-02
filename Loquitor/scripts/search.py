@@ -111,7 +111,7 @@ def is_xkcd_link(link):
 def on_xkcd(event, room, client, bot):
     query = event.query
     if not query:
-        random = urlopen_try_https("https://c.xkcd.com/random/comic").geturl()
+        random = urlopen_try_https("c.xkcd.com/random/comic").geturl()
         event.message.reply(random)
     elif query.isdigit():
         event.message.reply("https://xkcd.com/" + query)
