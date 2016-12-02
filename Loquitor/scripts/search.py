@@ -8,6 +8,7 @@ import re
 
 from bs4 import BeautifulSoup
 import requests
+from urllib.error import URLError
 from urllib.parse import quote_plus, urlencode, urlparse
 from urllib.request import urlopen
 
@@ -20,10 +21,16 @@ WIKI_DEFINE = 'en.wiktionary.org'
 WIKI_ENCYCL = 'en.wikipedia.org'
 METAS = ['meta.stackoverflow.com', 'meta.stackexchange.com']
 
+def urlopen_try_https(link_without_protocol):
+    try:
+        return urlopen("https://" + link_without_protocol)
+    except URLError:
+        return urlopen("http://" + link_without_protocol)
+
 def search_bing(q, results=-1, **kwargs):
     kwargs['q'] = q
-    url = "https://bing.com/search?" + urlencode(kwargs)
-    page = urlopen(url)
+    url = "bing.com/search?" + urlencode(kwargs)
+    page = urlopen_try_https(url)
     soup = BeautifulSoup(page)
 
     # A tag that shows up before the search results
@@ -104,7 +111,7 @@ def is_xkcd_link(link):
 def on_xkcd(event, room, client, bot):
     query = event.query
     if not query:
-        random = urlopen("https://c.xkcd.com/random/comic").geturl()
+        random = urlopen_try_with_https("https://c.xkcd.com/random/comic").geturl()
         event.message.reply(random)
     elif query.isdigit():
         event.message.reply("https://xkcd.com/" + query)
@@ -183,8 +190,8 @@ def on_whatis(event, room, client, bot):
 
 def on_youtube(event, room, client, bot):
     query = event.query
-    url = "https://youtube.com/results?search_query=" + quote_plus(query)
-    html = urlopen(url)
+    url = "youtube.com/results?search_query=" + quote_plus(query)
+    html = urlopen_try_https(url)
     soup = BeautifulSoup(html)
     result = soup.find('h3', {'class': 'yt-lockup-title'})
     if result is None:
