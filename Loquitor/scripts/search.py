@@ -27,6 +27,20 @@ def urlopen_try_https(link_without_protocol):
     except URLError:
         return urlopen("http://" + link_without_protocol)
 
+def get_instant_answer(query):
+    import pypygo
+    try:
+        q = pypygo.query(query)
+    except KeyError:
+        return False
+
+    if q.abstract:
+        return q.abstract
+    elif q.answer:
+        return q.answer
+    elif q.definition:
+        return q.definition
+
 def search_bing(q, results=-1, **kwargs):
     kwargs['q'] = q
     url = "bing.com/search?" + urlencode(kwargs)
@@ -84,6 +98,13 @@ def on_search(event, room, client, bot):
         messages.append(format.format(title=title, url=url, desc=desc))
 
     event.message.reply("\n\n\n".join(messages), False)
+
+def on_instant(event, room, client, bot):
+    result = get_instant_answer(event.query)
+    if result:
+        event.message.reply(result + "\n\nBrought to you with the DuckDuckGo instant answer API", False)
+    else:
+        event.message.reply("I couldn't find anything.")
 
 def on_meta(event, room, client, bot):
     meta_string = " or ".join(METAS)
@@ -207,7 +228,7 @@ def on_youtube(event, room, client, bot):
 commands = {'search': on_search, 'wiki': wiki_find, 'youtube': on_youtube,
             'define': lambda e,r,c,b: wiki_find(e,r,c,b,WIKI_DEFINE),
             'yt': on_youtube, 'whatis': on_whatis, 'xkcd': on_xkcd,
-            'meta': on_meta,
+            'meta': on_meta, 'instant': on_instant,
 }
 
 help = {
@@ -219,4 +240,5 @@ help = {
     'whatis': 'Find definition off of Google.  If nothing is found, use >>define',
     'xkcd': 'Search xkcd.com for a comic.  Can be given an id or a search term.',
     'meta': 'Search Meta Stack Overflow and Meta Stack Exchange for a query.',
+    'instant': 'Search DuckDuckGo instant answer API for a query.',
 }
