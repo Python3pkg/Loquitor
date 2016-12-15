@@ -28,7 +28,9 @@ def on_say(event, room, client, bot):
         user_name = convert_username(event.args[2], event)
         query = "@{}: {}".format(user_name, event.args[0])
     else:
-        query = ") " + query
+        # \u200b is an invisible character to prevent recursion when the
+        # query starts with the command prompt.
+        query = "\u200b" + query
 
     room.send_message(query)
 
