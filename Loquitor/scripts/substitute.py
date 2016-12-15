@@ -20,7 +20,7 @@ class main:
             except IOError:
                 warn("Could not open substitutions file.")
                 try:
-                    with open(path, 'w'):
+                    with open(path, 'w', encoding='utf-8'):
                         pass
                 except IOError:
                     warn("Could not create substitutions file.")
@@ -33,7 +33,7 @@ class main:
         key = None
         alias = None
         current = self.VALUES
-        with open(path) as infile:
+        with open(path, encoding='utf-8') as infile:
             for line in infile:
                 line = line.strip()
                 if not line:
