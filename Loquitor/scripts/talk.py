@@ -30,7 +30,7 @@ def on_say(event, room, client, bot):
     else:
         # \u200b is an invisible character to prevent recursion when the
         # query starts with the command prompt.
-        query = "\u200b" + query
+        query = "\u200b" + query.replace("@", "@\u200b")
 
     room.send_message(query)
 
