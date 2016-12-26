@@ -3,8 +3,8 @@ import os
 from setuptools import setup
 config_path = os.path.join(os.path.expanduser("~"), ".loquitor")
 py_modules = ['bot', 'skeleton']
-setup(name='Loquitor',
-      version='1.0',
+setup(name='loquitor',
+      version='1.0.3',
       description='Chatbot for Stack Overflow',
       author='Ralph Embree',
       author_email='ralph.embree@brominator.org',
