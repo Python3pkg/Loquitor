@@ -1,4 +1,8 @@
+from chatexchange.messages import Message
+
 import time
+
+from requests.exceptions import HTTPError
 
 exponents = {
     'yactosecond': -24,
@@ -55,7 +59,52 @@ def human_to_seconds(string):
             raise ValueError("Unknown time unit: {!r}".format(unit))
     return total
 
-class main:
+class Delete:
+    def __init__(self, room, bot, client):
+        room.connect("Command", self.on_command, bot)
+        bot.register("delete", self.delete_command, help="Syntax: delete <id> <id2> <id3> ...  Deletes own messages, specified by IDs. The reply syntax can also be used.  Just reply to a message with the single word `delete`, and the bot will try to delete it.")
+
+    def on_command(self, event, room, client, bot):
+        bot.register_response(event.data['message_id'], self.delete_reply)
+
+    def delete_reply(self, event, room, client):
+        if event.args[0] == "delete":
+            message = client.get_message(event.data['message_id']).parent
+            message_id = message.id
+            event.data['command'] = 'delete'
+            event.data['query'] = event.query.partition(" ")[-1]
+            event.data['message_id'] = message_id
+            event.data['args'] = [message_id] + event.args[1:]
+            for key in ('command', 'query', 'message_id', 'args'):
+                setattr(event, key, event.data[key])
+            self.delete_command(event, room, client)
+
+    def delete_command(self, event, room, client, bot=None):
+        args = event.args
+        messages = []
+        if args:
+            for arg in args:
+                try:
+                    message = client.get_message(int(arg))
+                    owner = message.owner
+                    if owner == client.get_me():
+                        message.delete()
+                    else:
+                        messages.append("{} is not one of my messages.".format(arg))
+                except ValueError:
+                    messages.append("{} is not a valid integer.".format(arg))
+                except HTTPError:
+                    messages.append("No message with {} id exists.".format(arg))
+            if messages:
+                if bot is not None:
+                    messages.insert(0, "Some of the messages were not deleted.")
+                message = "\n".join(messages)
+                event.message.reply(message, False)
+        else:
+            event.message.reply("To delete a message, reply to that message with the word `delete` or give me an id.")
+
+
+class Pause:
     def __init__(self, room, bot, client):
         self.play_time = 0
         bot.register("pause", self.pause, help="Given `>>pause 4 minutes`, stop listening for commands for 4 minutes.  Many time units are supported.  This is a RO-only command.")
@@ -89,3 +138,7 @@ class main:
                 event.message.reply("Only room owners can cancel.")
         else:
             event.message.reply("Only `cancel` is recognized.")
+
+def main(room, bot, client):
+    pause = Pause(room, bot, client)
+    delete = Delete(room, bot, client)

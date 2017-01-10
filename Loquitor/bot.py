@@ -156,10 +156,13 @@ class Bot:
             event.data['args'] = args
             event.data.update(vars(event))
             if command in self.commands:
+                event.data['event_type'] = 'Command'
+                first_event = Command(event.data, client)
                 event.data['event_type'] = 'Command_{}'.format(command)
                 new_event = self.commands[command](event.data, client)
                 try:
-                    room.emit(new_event, client)
+                    if not room.emit(first_event, client):
+                        room.emit(new_event, client)
                 except Exception as e:
                     new_event.message.reply("Oops. That's an error: {}".format(e))
                     print_exc()
@@ -190,7 +193,7 @@ class EventMeta(type, chatexchange.events.Event):
 class Command(metaclass=EventMeta):
     pass
 
-skeleton.Events.register('command', Command)
+skeleton.Events.register('Command', Command)
 
 
 def main(username, password, room, config_dir, host='stackoverflow.com', no_input=False):
