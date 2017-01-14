@@ -1,7 +1,8 @@
-from chatexchange.messages import Message
-
+import html
+import sys
 import time
 
+from chatexchange.messages import Message
 from requests.exceptions import HTTPError
 
 exponents = {
@@ -61,20 +62,24 @@ def human_to_seconds(string):
 
 class Delete:
     def __init__(self, room, bot, client):
-        room.connect("Command", self.on_command, bot)
+        bot_module = sys.modules[bot.__module__]
+        self.get_query_args = getattr(bot_module, 'get_query_args')
+        room.connect("message-reply", self.on_reply)
         bot.register("delete", self.delete_command, help="Syntax: delete <id> <id2> <id3> ...  Deletes own messages, specified by IDs. The reply syntax can also be used.  Just reply to a message with the single word `delete`, and the bot will try to delete it.")
 
     def on_command(self, event, room, client, bot):
         bot.register_response(event.data['message_id'], self.delete_reply)
 
-    def delete_reply(self, event, room, client):
-        if event.args[0] == "delete":
+    def on_reply(self, event, room, client):
+        _, _, string = html.unescape(event.content).partition(' ')
+        command = string.split()[0]
+        if command == "delete":
             message = client.get_message(event.data['message_id']).parent
             message_id = message.id
             event.data['command'] = 'delete'
-            event.data['query'] = event.query.partition(" ")[-1]
+            event.data['query'] = str(message_id)
             event.data['message_id'] = message_id
-            event.data['args'] = [message_id] + event.args[1:]
+            event.data['args'] = [str(message_id)]
             for key in ('command', 'query', 'message_id', 'args'):
                 setattr(event, key, event.data[key])
             self.delete_command(event, room, client)
