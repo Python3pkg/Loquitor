@@ -21,7 +21,7 @@ class main:
                 return
         else:
             print("If you would like to have the translate command, please give your Bing translation credentials.  If you aren't willing, just hit Enter to skip this feature.")
-            client_id = input("Client ID: ")
+            client_id = eval(input("Client ID: "))
             if not client_id:
                 return
             secret = getpass("Secret: ")
@@ -58,7 +58,7 @@ class main:
                 event.message.reply("Either you didn't put your text in quotation marks, or you're trying to use commands that I don't understand.")
             else:
                 text = " ".join(leftover)
-                for key, value in parsed.items():
+                for key, value in list(parsed.items()):
                     dic[keys[key]] = value
                 event.message.reply(self.translator.translate(text, **dic), False)
         except UnknownLanguageError as e:

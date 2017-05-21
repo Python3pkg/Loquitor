@@ -1,3 +1,4 @@
+import collections
 class ParsingError(Exception):
     pass
 
@@ -51,7 +52,7 @@ class Parser:
             ):
 
                 raise WrongArgsError(num_args)
-        elif callable(matcher):
+        elif isinstance(matcher, collections.Callable):
             result = matcher(token, args)
             if result is not None:
                 return result

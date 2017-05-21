@@ -14,6 +14,7 @@ import unicodedata
 import chatexchange
 
 from . import skeleton
+import collections
 
 class Bot:
     UNKNOWN_MESSAGES = (
@@ -85,7 +86,7 @@ class Bot:
             return None
 
         command_help = self.commands[command].help
-        if callable(command_help):
+        if isinstance(command_help, collections.Callable):
             return command_help(*args)
         return command_help
             
@@ -141,7 +142,7 @@ class Bot:
             event.data['query'] = query
             event.data['args'] = args
             event.data.update(vars(event))
-            for key, value in event.data.items():
+            for key, value in list(event.data.items()):
                 setattr(event, key, value)
             self.responses[response_id](event, room, client)
 
@@ -187,7 +188,7 @@ class EventMeta(type, chatexchange.events.Event):
 
     def _default_init(self, data, client):
         chatexchange.events.Event.__init__(self, data, client)
-        for key, value in data.items():
+        for key, value in list(data.items()):
             setattr(self, key, value)
 
 class Command(metaclass=EventMeta):
@@ -205,17 +206,17 @@ def main(username, password, room, config_dir, host='stackoverflow.com', no_inpu
 
     for module_name in scripts.__all__:
         module = sys.modules['Loquitor.scripts.{}'.format(module_name)]
-        if hasattr(module, 'main') and callable(module.main):
+        if hasattr(module, 'main') and isinstance(module.main, collections.Callable):
             module.main(room, bot, client)
         elif hasattr(module, 'commands') and hasattr(module.commands, 'items'):
-            for com_name, func in module.commands.items():
+            for com_name, func in list(module.commands.items()):
                 bot.register(com_name, func)
 
             if hasattr(module, 'help') and hasattr(module.help, 'items'):
-                for command, help in module.help.items():
+                for command, help in list(module.help.items()):
                     bot.commands[command].help = help
         else:
-            print("Invalid script file: {!r}".format(module_name))
+            print(("Invalid script file: {!r}".format(module_name)))
 
     return client, room, bot
 
